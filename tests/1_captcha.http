@@ -1,0 +1,3 @@
+GET /captcha HTTP/1.1
+Host: localhost:9999
+X-Request-ID: 1234

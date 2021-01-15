@@ -1,0 +1,10 @@
+POST /exchange HTTP/1.1
+Host: localhost:9999
+X-Request-ID: 1234
+Content-Type: application/json
+Content-Length: 72
+
+{
+    "key":"6f40cae5-a28d-4421-a426-abaf69112755",
+    "answer":11
+}
