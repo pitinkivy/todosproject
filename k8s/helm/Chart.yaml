@@ -1,0 +1,11 @@
+apiVersion: v1
+description: Todos Service Helm Chart
+name: todos
+version: 1.0.0
+appVersion: 1.0.0
+home: https://demo.redbuta.co.th/gotraining/todos
+maintainers:
+  - name: demo
+    email: demo@redbuta.co.th
+sources:
+  - https://git.demo.redbuta.co.th/gotraining/todos.git

@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  ratings:
+    build: .
+    ports:
+      - "9999:9999"
+    environment:
+      SERVICE_VERSION: v1.0
+      APP_ADDR: 0.0.0.0:9999
+      APP_DBCONNECTIONURL: sqlserver://test:test@localhost:1434?database=go_training

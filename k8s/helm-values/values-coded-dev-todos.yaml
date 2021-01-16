@@ -1,0 +1,20 @@
+todos:
+  namespace: gotraining-todos-dev
+  image: registry.demo.redbuta.co.th/gotraining/todos
+  tag: dev
+  replicas: 1
+  imagePullSecrets: registry-gotraining
+  port: 9999
+  healthCheckPath: "/health"
+ingress:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  host: gotraining.dev.redbuta.co.th
+  path: "/gotraining/todos(/|$)(.*)"
+  serviceType: ClusterIP
+extraEnv:
+  COMMIT_ID: CHANGEME
+  SERVICE_VERSION: v1
+  APP_ADDR: 0.0.0.0:9999
+  APP_DBCONNECTIONURL: sqlserver://test:test@localhost:1434?database=go_training

@@ -36,6 +36,8 @@ func goDotEnvVariable(key string) string {
 	return os.Getenv(key)
 }
 
+var healthy = false
+
 func main() {
 	//goDotEnvVariable()
 
@@ -56,7 +58,7 @@ func main() {
 	defer l.Sync() // flushes buffer, if any
 
 	// github.com/denisenkom/go-mssqldb
-	dsn := viper.GetString("app.db_connection")
+	dsn := viper.GetString("app.dbconnectionurl")
 	db, err := gorm.Open(sqlserver.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
@@ -67,10 +69,12 @@ func main() {
 		*/
 	}
 
+	healthy = true
+
 	router := echo.New()
 	router.Use(middleware.Logger())
 	router.Use(middleware.Recover())
-	router.Use(logger.MiddlewareLogger(l))
+	//router.Use(logger.MiddlewareLogger(l))
 	//router.Use(cors.Default())
 
 	//#region public path
@@ -79,12 +83,13 @@ func main() {
 	})
 
 	// for get captcha
-	router.GET("/captcha", captchaHandler)
+	router.GET("/captcha", captchaHandler,logger.MiddlewareLogger(l))
 	// for exchange captcha answer for jwt token
-	router.POST("/exchange", exchangeHandler)
+	router.POST("/exchange", exchangeHandler,logger.MiddlewareLogger(l))
 	//#endregion
 
 	todosGroup := router.Group("/todos")
+	todosGroup.Use(logger.MiddlewareLogger(l))
 	todosGroup.Use(auth.MiddlewareJwtAuthen())
 	//#region secure path using Bearer
 	todosGroup.POST("", todos.NewTodoHandler(db))
@@ -92,7 +97,11 @@ func main() {
 	todosGroup.GET("/:id", todos.GetTodoByIdHandler(db))
 	todosGroup.PUT("/:id", todos.PutUpdateTodoHandler(db))
 	todosGroup.DELETE("/:id", todos.DeleteTodoHandler(db))
-
+	//#endregion
+	
+	// /health
+	router.GET("/health", healthHandler)
+	
 	srv := &http.Server{
 		Addr:         viper.GetString("app.addr"),
 		Handler:      router,
@@ -137,6 +146,19 @@ func captchaHandler(c echo.Context) error {
 		"key":     key,
 		"captcha": captcha,
 	})
+}
+
+func healthHandler(c echo.Context) error {
+	if healthy{
+		return c.JSON(http.StatusOK, map[string]string{
+			"status": "app is working",
+		})
+	}else{
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"status": "app is not working",
+		})
+	}
+	
 }
 
 func exchangeHandler(c echo.Context) error {
