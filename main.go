@@ -87,8 +87,9 @@ func main() {
 	todosGroup := router.Group("/todos")
 	todosGroup.Use(auth.MiddlewareJwtAuthen())
 	//#region secure path using Bearer
-	todosGroup.POST("/", todos.NewTodoHandler(db))
-	todosGroup.GET("/", todos.GetTodoHandler(db))
+	todosGroup.POST("", todos.NewTodoHandler(db))
+	todosGroup.GET("", todos.GetAllTodoHandler(db))
+	todosGroup.GET("/:id", todos.GetTodoByIdHandler(db))
 	todosGroup.PUT("/:id", todos.PutUpdateTodoHandler(db))
 	todosGroup.DELETE("/:id", todos.DeleteTodoHandler(db))
 
